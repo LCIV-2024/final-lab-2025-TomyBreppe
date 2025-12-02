@@ -108,8 +108,8 @@ class GameServiceTest {
         existingGame.setFechaInicio(LocalDateTime.now());
 
         when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
-        when(wordRepository.findRandomWord()).thenReturn(Optional.of(word));
-        when(gameInProgressRepository.findByJugadorAndPalabra(1L, 1L)).thenReturn(Optional.of(existingGame));
+        when(gameInProgressRepository.findByJugadorIdOrderByFechaInicioDesc(1L))
+                .thenReturn(Arrays.asList(existingGame));
 
         // When
         GameResponseDTO result = gameService.startGame(1L);
@@ -118,7 +118,9 @@ class GameServiceTest {
         assertNotNull(result);
         assertEquals(5, result.getIntentosRestantes());
         verify(gameInProgressRepository, never()).save(any(GameInProgress.class));
+        verify(wordRepository, never()).findRandomWord();
     }
+
 
     @Test
     void testMakeGuess_Success_NewGame() {
