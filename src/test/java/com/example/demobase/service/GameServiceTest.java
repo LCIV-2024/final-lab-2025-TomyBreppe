@@ -55,8 +55,22 @@ class GameServiceTest {
 
     @Test
     void testStartGame_Success() {
-        // TODO: Implementar el test para testStartGame_Success
-        
+        // TO DO: Implementar el test para testStartGame_Success
+        when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
+        when(gameInProgressRepository.findByJugadorIdOrderByFechaInicioDesc(1L))
+                .thenReturn(new ArrayList<>());
+        when(wordRepository.findRandomWord()).thenReturn(Optional.of(word));
+        when(gameInProgressRepository.save(any(GameInProgress.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        GameResponseDTO result = gameService.startGame(1L);
+
+        assertNotNull(result);
+        assertEquals(7, result.getIntentosRestantes());
+        assertFalse(result.getPalabraCompleta());
+        assertEquals("___________", result.getPalabraOculta()); // PROGRAMADOR → 11 letras ocultas
+        verify(gameInProgressRepository, times(1)).save(any(GameInProgress.class));
+        verify(wordRepository, times(1)).save(any(Word.class));
     }
 
     @Test
